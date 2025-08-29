@@ -294,8 +294,8 @@ abstract class Abstract_Option {
 	 *
 	 * @return array The updated site health information.
 	 */
-	public function add_to_site_health_info( array $info, Options $options ): array { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		return $info;
+	public function get_site_health_info( Options $options ): array { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		return array();
 	}
 
 	/**
@@ -309,15 +309,10 @@ abstract class Abstract_Option {
 	 *
 	 * @return array Updated array of site health information including the new fields.
 	 */
-	protected function get_site_health_info( array $info, mixed $value, string $key ): array {
-		return array_merge(
-			$info,
-			array(
-				$key => array(
-					'label' => $key,
-					'value' => $value,
-				),
-			)
+	protected function format_single_value_for_site_health_info( mixed $value ): array {
+		return array(
+			'label' => static::key(),
+			'value' => $value,
 		);
 	}
 
