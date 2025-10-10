@@ -37,16 +37,6 @@ class Polylang {
 	public function __construct() {
 		require_once __DIR__ . '/functions.php'; // VIP functions
 
-		// register an action when plugin is activating.
-		register_activation_hook( POLYLANG_BASENAME, array( 'PLL_Wizard', 'start_wizard' ) );
-
-		$install = new PLL_Install( POLYLANG_BASENAME );
-
-		// Stopping here if we are going to deactivate the plugin ( avoids breaking rewrite rules )
-		if ( $install->is_deactivation() || ! $install->can_activate() ) {
-			return;
-		}
-
 		// Plugin initialization
 		// Take no action before all plugins are loaded
 		add_action( 'plugins_loaded', array( $this, 'init' ), 1 );
@@ -281,11 +271,10 @@ class Polylang {
 		require_once POLYLANG_DIR . '/include/api.php';
 
 		// Loads the modules.
-		$load_scripts = glob( POLYLANG_DIR . '/modules/*/load.php', GLOB_NOSORT );
-		if ( is_array( $load_scripts ) ) {
-			foreach ( $load_scripts as $load_script ) {
-				require_once $load_script; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
-			}
+		$load_scripts = require POLYLANG_DIR . '/modules/module-build.php';
+
+		foreach ( $load_scripts as $load_script ) {
+			require_once POLYLANG_DIR . "/modules/{$load_script}/load.php";
 		}
 
 		$polylang->init();
