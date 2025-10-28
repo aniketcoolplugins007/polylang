@@ -325,6 +325,44 @@ class PLL_Admin_Links extends PLL_Links {
 	}
 
 	/**
+	 * Returns the html markup for a post edit link.
+	 *
+	 * @since 3.8
+	 *
+	 * @param WP_Post      $post     The post.
+	 * @param PLL_Language $language The language of the post.
+	 * @param string       $mode     Optional. How the link should be displayed: with a pen icon or a language's flag.
+	 *                               Possible values are `icon` and `flag`. Default is `icon`.
+	 * @return string
+	 *
+	 * @phpstan-param 'icon'|'flag' $mode
+	 */
+	public function get_edit_post_item_link_tag( WP_Post $post, PLL_Language $language, string $mode = 'icon' ): string {
+		$url = $this->get_edit_post_translation_link( $post->ID, $language );
+		return $this->get_edit_item_link( $url, $post->ID, $post->post_title, $language, $mode );
+	}
+
+	/**
+	 * Returns the html markup for a term edit link.
+	 *
+	 * @since 3.8
+	 *
+	 * @param WP_Term      $term      The term.
+	 * @param string       $taxonomy  Taxonomy name.
+	 * @param string       $post_type Post type name.
+	 * @param PLL_Language $language  The language of the term.
+	 * @param string       $mode      Optional. How the link should be displayed: with a pen icon or a language's flag.
+	 *                                Possible values are `icon` and `flag`. Default is `icon`.
+	 * @return string
+	 *
+	 * @phpstan-param 'icon'|'flag' $mode
+	 */
+	public function get_edit_term_item_link_tag( WP_Term $term, string $taxonomy, string $post_type, PLL_Language $language, string $mode = 'icon' ): string {
+		$url = $this->get_edit_term_translation_link( $term->term_id, $taxonomy, $post_type, $language );
+		return $this->get_edit_item_link( $url, $term->term_id, $term->name, $language, $mode );
+	}
+
+	/**
 	 * Returns a link to edit an item (or an icon/flag if the current user is not allowed to).
 	 *
 	 * @since 3.8
@@ -339,7 +377,7 @@ class PLL_Admin_Links extends PLL_Links {
 	 *
 	 * @phpstan-param 'icon'|'flag' $mode
 	 */
-	public function get_item_edition_link( string $url, int $item_id, string $item_name, PLL_Language $language, string $mode = 'icon' ): string {
+	public function get_edit_item_link( string $url, int $item_id, string $item_name, PLL_Language $language, string $mode = 'icon' ): string {
 		if ( 'flag' === $mode ) {
 			$flag  = $language->flag ?: sprintf( '<abbr>%s</abbr>', esc_html( $language->slug ) );
 			$class = 'pll_column_flag';
