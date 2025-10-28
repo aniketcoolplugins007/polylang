@@ -325,6 +325,69 @@ class PLL_Admin_Links extends PLL_Links {
 	}
 
 	/**
+	 * Returns a link to edit an item (or an icon/flag if the current user is not allowed to).
+	 *
+	 * @since 3.8
+	 *
+	 * @param string       $url       URL of the edition link.
+	 * @param int          $item_id   ID of the item.
+	 * @param string       $item_name Name of the item.
+	 * @param PLL_Language $language  Language of the item.
+	 * @param string       $mode      Optional. How the link should be displayed: with a pen icon or a language's flag.
+	 *                                Possible values are `icon` and `flag`. Default is `icon`.
+	 * @return string
+	 *
+	 * @phpstan-param 'icon'|'flag' $mode
+	 */
+	public function get_item_edition_link( string $url, int $item_id, string $item_name, PLL_Language $language, string $mode = 'icon' ): string {
+		if ( 'flag' === $mode ) {
+			$flag  = $language->flag ?: sprintf( '<abbr>%s</abbr>', esc_html( $language->slug ) );
+			$class = 'pll_column_flag';
+		} else {
+			$flag  = '';
+			$class = 'pll_icon_edit';
+		}
+
+		if ( empty( $url ) ) {
+			// The current user is not allowed to edit the item.
+			if ( 'flag' === $mode ) {
+				/* translators: accessibility text, %s is a native language name */
+				$hint = sprintf( __( 'You are not allowed to edit this item in %s', 'polylang' ), $language->name );
+			} else {
+				/* translators: accessibility text, %s is a native language name */
+				$hint = sprintf( __( 'You are not allowed to edit a translation in %s', 'polylang' ), $language->name );
+			}
+
+			return sprintf(
+				'<span title="%s" class="%s wp-ui-text-icon"><span class="screen-reader-text">%s</span>%s</span>',
+				esc_attr( $hint ),
+				esc_attr( $class ),
+				esc_html( $hint ),
+				$flag // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+		} else {
+			// The current user is allowed to edit the item.
+			if ( 'flag' === $mode ) {
+				/* translators: accessibility text, %s is a native language name */
+				$hint = sprintf( __( 'Edit this item in %s', 'polylang' ), $language->name );
+			} else {
+				/* translators: accessibility text, %s is a native language name */
+				$hint   = sprintf( __( 'Edit the translation in %s', 'polylang' ), $language->name );
+				$class .= " translation_{$item_id}";
+			}
+
+			return sprintf(
+				'<a href="%s" class="%s" title="%s"><span class="screen-reader-text">%s</span>%s</a>',
+				esc_url( $url ),
+				esc_attr( $class ),
+				esc_attr( $item_name ),
+				esc_html( $hint ),
+				$flag // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+		}
+	}
+
+	/**
 	 * Returns some data (`from_post` and `new_lang`) from the current request.
 	 *
 	 * @since 3.7
